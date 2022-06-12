@@ -1,17 +1,5 @@
 const Joi = require("@hapi/joi");
 
-const createPortofolioValidation = (data) => {
-  const schema = Joi.object({
-    title: Joi.string().min(3).required(),
-    descriptions: Joi.string().min(5),
-    images: Joi.object(),
-    token: Joi.string(),
-    portofolio_type: Joi.string(),
-  });
-
-  return schema.validate(data);
-};
-
 const createUserValidation = (data) => {
   const schema = Joi.object({
     lastname: Joi.string().min(3).required(),
@@ -21,7 +9,9 @@ const createUserValidation = (data) => {
     phone: Joi.string().min(6),
     social_link: Joi.object(),
     password: Joi.string().min(6).required(),
-    grade: Joi.string()
+    grade: Joi.string().required,
+    city: Joi.string(),
+    country: Joi.string(),
   });
 
   return schema.validate(data);
@@ -50,7 +40,7 @@ const createHouseValidation = (data) => {
     capacity: Joi.string(),
     price: Joi.string().required(),
     photos: Joi.object(),
-    off_days: Joi.object(),
+    off_days: Joi.array().items(Joi.number()),
     location: Joi.string(),
     user_id: Joi.string().guid({ version: ["uuidv4", "uuidv5"] }).required(),
   });
@@ -104,7 +94,8 @@ const createBookingValidation = (data) => {
     end_date: Joi.number().required(),
     house: Joi.number().required(),
     user_id: Joi.string().guid({ version: ["uuidv4", "uuidv5"] }).required(),
-    reserved_names: Joi.string()
+    reserved_names: Joi.string(),
+    billing_details: Joi.object(),
   });
 
   return schema.validate(data);
@@ -148,7 +139,16 @@ const updatePagesValidation = (data) => {
   return schema.validate(data);
 };
 
-module.exports.createPortofolioValidation = createPortofolioValidation;
+const paymentsIntentmentValidation = (data) => {
+  const schema = Joi.object({
+    amount: Joi.number().required(),
+    currency: Joi.string(),
+    paymentType: Joi.string(),
+  });
+
+  return schema.validate(data);
+};
+
 module.exports.loginValidation = loginValidation;
 module.exports.logoutValidation = logoutValidation;
 module.exports.createUserValidation = createUserValidation;
@@ -161,3 +161,4 @@ module.exports.updateBookingValidation = updateBookingValidation;
 module.exports.createPagesValidation = createPagesValidation;
 module.exports.updatePagesValidation = updatePagesValidation;
 module.exports.sendMailValidation = sendMailValidation;
+module.exports.paymentsIntentmentValidation = paymentsIntentmentValidation;

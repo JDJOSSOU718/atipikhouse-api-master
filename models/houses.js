@@ -83,15 +83,19 @@ class Houses {
   }
 
   static findById(id) {
-    return pool.query("SELECT houses.*, users.first_name, users.last_name FROM houses INNER JOIN users ON houses.created_by = users.id WHERE houses.id=$1", [id]);
+    return pool.query("SELECT houses.*, users.first_name, users.last_name, users.email, users.address, users.phone, users.social_link FROM houses INNER JOIN users ON houses.created_by = users.id WHERE houses.id=$1", [id]);
   }
 
   static findByAuthor (id){
-    return pool.query("SELECT houses.*, users.first_name, users.last_name FROM houses INNER JOIN users ON houses.created_by = users.id WHERE houses.created_by = $1", [id])
+    return pool.query("SELECT houses.*, users.first_name, users.last_name, users.email, users.address, users.phone, users.social_link FROM houses INNER JOIN users ON houses.created_by = users.id WHERE houses.created_by = $1", [id])
+  }
+
+  static findHousesBookedByAuthor (id){
+    return pool.query("SELECT booking.*, houses.*, users.first_name, users.last_name, users.email, users.address, users.phone, users.social_link FROM booking INNER JOIN houses ON booking.house = houses.id INNER JOIN users ON houses.created_by = users.id WHERE houses.created_by = $1 ORDER BY booking.start_date DESC", [id])
   }
 
   static getAll() {
-    return pool.query("SELECT houses.*, users.first_name, users.last_name FROM houses INNER JOIN users ON houses.created_by = users.id ORDER BY title DESC");
+    return pool.query("SELECT houses.*, users.first_name, users.last_name, users.email, users.address, users.phone, users.social_link FROM houses INNER JOIN users ON houses.created_by = users.id ORDER BY title DESC");
   }
 
   static updateNotify(id, notify=false) {
@@ -99,6 +103,16 @@ class Houses {
       "UPDATE houses SET notify=$1  WHERE id=$2 RETURNING id",
       [
           notify,
+          id
+      ]
+    );
+  }
+
+  static updateHouseOffDays(id, offDays) {
+    return pool.query(
+      "UPDATE houses SET off_days=$1  WHERE id=$2 RETURNING id",
+      [
+          offDays,
           id
       ]
     );
